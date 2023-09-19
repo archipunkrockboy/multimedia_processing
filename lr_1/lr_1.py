@@ -51,14 +51,13 @@ def show_video(path='media/willem dafoe'):
     cv2.destroyAllWindows()
 
 
-show_video()
+# show_video()
 """
 Задание 4 Записать видео из файла в другой файл.
 """
 
 
 def read_and_write(path='media/willem dafoe.mp4'):
-
     video_capture = cv2.VideoCapture(path)
     video_writer = cv2.VideoWriter(
         'media/output.mp4',
@@ -82,8 +81,8 @@ def read_and_write(path='media/willem dafoe.mp4'):
     cv2.destroyAllWindows()
 
 
-read_and_write()
-show_video('media/output.avi')
+# read_and_write()
+# show_video('media/output.avi')
 
 
 """
@@ -93,7 +92,16 @@ show_video('media/output.avi')
 """
 
 
+def convert_to_hsv(path='media/monkeys.jpg'):
+    image = cv2.imread(path)
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    cv2.imshow('image', image)
+    cv2.imshow('hsv_image', hsv_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
+
+# convert_to_hsv()
 """
 Задание 6. Прочитать изображение с камеры. Вывести
 в центре на экране Красный крест в формате, как на изображении. Указать
@@ -101,6 +109,37 @@ show_video('media/output.avi')
 """
 
 
+def red_cross():
+    video_capture = cv2.VideoCapture(0)
+    while video_capture.isOpened():
+        is_successful, frame = video_capture.read()
+
+        if is_successful:
+            frame_width = video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)
+            frame_height = video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            cv2.rectangle(
+                frame,
+                (int(frame_width // 2 - 10), 100),
+                (int(frame_width // 2 + 10), int(frame_height - 100)),
+                (0, 0, 255),
+            )
+            cv2.rectangle(
+                frame,
+                (200, int(frame_height // 2 - 10)),
+                (int(frame_width - 200), int(frame_height // 2 + 10)),
+                (0, 0, 255),
+            )
+            cv2.imshow('red_cross', frame)
+            key = cv2.waitKey(10)
+            if cv2.waitKey(5) == ord('q') or key == 27:
+                break
+        else:
+            break
+    video_capture.release()
+    cv2.destroyAllWindows()
+
+
+red_cross()
 """
 Задание 7. Отобразить информацию с вебкамеры,
 записать видео в файл, продемонстрировать видео."""
@@ -112,9 +151,8 @@ show_video('media/output.avi')
 зеленый, синий и таким цветом заполнить крест.
 """
 
-
 """
-Подключите телефон, подключитесь к его
+Задание 9. Подключите телефон, подключитесь к его
 камере, выведете на экран видео с камеры. Продемонстрировать процесс на
 ноутбуке преподавателя и своем телефоне.
 """
