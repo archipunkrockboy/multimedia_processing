@@ -109,26 +109,32 @@ def convert_to_hsv(path='media/monkeys.jpg'):
 """
 
 
+def draw_cross(video_capture, frame, color, filled=0):
+    frame_width = video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)
+    frame_height = video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+
+    cv2.rectangle(
+        frame,
+        (int(frame_width // 2 - 10), 100),
+        (int(frame_width // 2 + 10), int(frame_height - 100)),
+        color,
+        filled,
+    )
+    cv2.rectangle(
+        frame,
+        (200, int(frame_height // 2 - 10)),
+        (int(frame_width - 200), int(frame_height // 2 + 10)),
+        color,
+        filled
+    )
+
+
 def red_cross():
     video_capture = cv2.VideoCapture(0)
     while video_capture.isOpened():
         is_successful, frame = video_capture.read()
-
         if is_successful:
-            frame_width = video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)
-            frame_height = video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            cv2.rectangle(
-                frame,
-                (int(frame_width // 2 - 10), 100),
-                (int(frame_width // 2 + 10), int(frame_height - 100)),
-                (0, 0, 255),
-            )
-            cv2.rectangle(
-                frame,
-                (200, int(frame_height // 2 - 10)),
-                (int(frame_width - 200), int(frame_height // 2 + 10)),
-                (0, 0, 255),
-            )
+            draw_cross(video_capture, frame, (0, 0, 255), 4)
             cv2.imshow('red_cross', frame)
             key = cv2.waitKey(10)
             if cv2.waitKey(5) == ord('q') or key == 27:
@@ -139,7 +145,7 @@ def red_cross():
     cv2.destroyAllWindows()
 
 
-red_cross()
+#red_cross()
 """
 Задание 7. Отобразить информацию с вебкамеры,
 записать видео в файл, продемонстрировать видео."""
@@ -151,6 +157,41 @@ red_cross()
 зеленый, синий и таким цветом заполнить крест.
 """
 
+
+def fill_central_pixel():
+    video_capture = cv2.VideoCapture(0)
+    while video_capture.isOpened():
+        is_successful, frame = video_capture.read()
+
+        if is_successful:
+            frame_width = video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)
+            frame_height = video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            central_pixel = frame[
+                int(frame_height // 2):int(frame_height // 2 + 1),
+                int(frame_width // 2):int(frame_width // 2 + 1)
+            ][0][0]
+            central_pixel = (255, 0, 0) if max(central_pixel) == central_pixel[0] else (
+                (0, 255, 0) if max(central_pixel) == central_pixel[1] else (
+                    (0, 0, 255) if max(central_pixel) == central_pixel[2] else None
+                )
+            )
+
+            frame[
+                int(frame_height // 2 - 3):int(frame_height // 2 + 2),
+                int(frame_width // 2 - 3):int(frame_width // 2 + 2)
+            ] = central_pixel
+            draw_cross(video_capture, frame, central_pixel, cv2.FILLED)
+            cv2.imshow('red_cross', frame)
+            key = cv2.waitKey(10)
+            if cv2.waitKey(5) == ord('q') or key == 27:
+                break
+        else:
+            break
+    video_capture.release()
+    cv2.destroyAllWindows()
+
+
+fill_central_pixel()
 """
 Задание 9. Подключите телефон, подключитесь к его
 камере, выведете на экран видео с камеры. Продемонстрировать процесс на
