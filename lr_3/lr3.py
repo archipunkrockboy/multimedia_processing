@@ -1,6 +1,5 @@
 import datetime
-import time
-from typing import Union, List
+from typing import Union
 
 import cv2
 import numpy as np
@@ -24,12 +23,8 @@ def get_normalized_matrix(matrix: list[list[Union[int, float]]]) -> list[list[Un
     return list(map(lambda row: list(map(lambda elem: elem / sum_of_elements, row)), matrix))
 
 
-def convolution_operation():
-    pass
-
-
 def gauss_blur(img: cv2.mat_wrapper, kernel_size: int, standard_deviation: int) -> cv2.mat_wrapper:
-    kernel = get_normalized_matrix(get_gauss_matrix(kernel_size, standard_deviation))
+    kernel = np.array(get_normalized_matrix(get_gauss_matrix(kernel_size, standard_deviation)))
     x_start = y_start = kernel_size // 2
     copy_image = img.copy()
     for i in range(x_start, copy_image.shape[0] - x_start):
@@ -37,21 +32,40 @@ def gauss_blur(img: cv2.mat_wrapper, kernel_size: int, standard_deviation: int) 
             val = 0
             for k in range(-(kernel_size // 2), kernel_size // 2 + 1):
                 for l in range(-(kernel_size // 2), kernel_size // 2 + 1):
-                    val += img[i + k][j + l] * kernel[k + (kernel_size // 2)][l + (kernel_size // 2)]
+                    val += img[i + k, j + l] * kernel[k + (kernel_size // 2), l + (kernel_size // 2)]
+
             copy_image[i][j] = val
     return copy_image
 
 
 def main():
-    img = cv2.imread("test2.jpg", cv2.IMREAD_GRAYSCALE)
+    # Задание 1: построить матрицу Гаусса
+    # gauss_matrix_5_100 = get_gauss_matrix(5, 100)
+    # gauss_matrix_7_50 = get_gauss_matrix(7, 50)
 
-    #  размер ядра фильтра и стандартное отклонение
-    kernel_size = 5
-    standard_deviation = 100
+    # Задание 2: нормировать матрицу
+    # norm_gauss_5_100 = get_normalized_matrix(gauss_matrix_5_100)
+    # norm_gauss_7_50 = get_normalized_matrix(gauss_matrix_7_50)
 
-    img_blur_1 = gauss_blur(img, kernel_size, standard_deviation)
+    img = cv2.imread('test2.jpg', cv2.IMREAD_GRAYSCALE)
 
-    cv2.imshow(str(kernel_size) + 'x' + str(kernel_size) + ' and deviation ' + str(standard_deviation), img_blur_1)
+    # Задание 3-4: реализовать фильтр гаусса средствами языка python
+
+    start = datetime.datetime.now()
+    img1 = gauss_blur(img, 5, 100)
+    end = datetime.datetime.now()
+    print(end - start)
+    # img2 = gauss_blur(img, 7, 50)
+    #
+    # # Задание 5: реализовать фильтр гаусса методами cv2
+    #
+    # img3 = cv2.GaussianBlur(img, (5, 5), 5)
+    #
+    # cv2.imshow(f'5 100', img)
+    # cv2.imshow(f'5 100', img1)
+    # cv2.imshow(f'7 50', img2)
+    # cv2.imshow('gavno', img3)
+    # # Задание 6: сравнить
     cv2.waitKey(0)
 
 
