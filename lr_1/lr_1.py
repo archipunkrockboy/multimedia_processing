@@ -2,6 +2,7 @@
 Задание 1. Установить библиотеку OpenCV.
 """
 import cv2
+import numpy as np
 
 """
 Задание 2. Вывести на экран изображение. Протестировать три
@@ -40,9 +41,11 @@ def show_video(path='media/willem dafoe'):
     while video_capture.isOpened():
         is_successful, frame = video_capture.read()
         if is_successful:
+
+            frame = cv2.cvtColor(cv2.resize(frame, (300, 700)), cv2.COLOR_RGB2GRAY)
+
             cv2.imshow('willem dafoe', frame)
-            key = cv2.waitKey(20)
-            if cv2.waitKey(5) == ord('q') or key == 27:
+            if cv2.waitKey(1) & 0xFF == 27:
                 break
         else:
             break
@@ -51,7 +54,7 @@ def show_video(path='media/willem dafoe'):
     cv2.destroyAllWindows()
 
 
-# show_video()
+# show_video(path='media/willem dafoe.mp4')
 """
 Задание 4 Записать видео из файла в другой файл.
 """
@@ -59,17 +62,16 @@ def show_video(path='media/willem dafoe'):
 
 def read_and_write(path='media/willem dafoe.mp4'):
     video_capture = cv2.VideoCapture(path)
-    video_writer = cv2.VideoWriter(
-        'media/output.mp4',
-        0,
-        20.0,
-        (int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)))
-    )
+    w = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+    h = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    video_writer = cv2.VideoWriter(f'output/task_4.mp4', fourcc, 25, (w, h))
+
     while video_capture.isOpened():
         is_successful, frame = video_capture.read()
         if is_successful:
-            video_writer.write(frame)
             cv2.imshow('willem dafoe', frame)
+            video_writer.write(frame)
             key = cv2.waitKey(20)
             if cv2.waitKey(5) == ord('q') or key == 27:
                 break
@@ -82,7 +84,7 @@ def read_and_write(path='media/willem dafoe.mp4'):
 
 
 # read_and_write()
-# show_video('media/output.avi')
+# show_video('media/output.mp4')
 
 
 """
@@ -129,6 +131,24 @@ def draw_cross(video_capture, frame, color, filled=0):
     )
 
 
+def draw_pentagram(video_capture, frame, color):
+    width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    center_x, center_y = width // 2, height // 2
+    radius = 120
+    pentagon_points = []
+    for i in range(5):
+        x = center_x + int(radius * np.cos(2 * np.pi * i / 5))
+        y = center_y + int(radius * np.sin(2 * np.pi * i / 5))
+        pentagon_points.append((x, y))
+
+    for i in range(5):
+        cv2.line(frame, pentagon_points[i], pentagon_points[(i + 2) % 5], color, 4)
+
+    cv2.circle(frame, (center_x, center_y), 120, color, 4)
+
+
 def red_cross():
     video_capture = cv2.VideoCapture(0)
     while video_capture.isOpened():
@@ -145,10 +165,36 @@ def red_cross():
     cv2.destroyAllWindows()
 
 
-#red_cross()
+# red_cross()
 """
 Задание 7. Отобразить информацию с вебкамеры,
 записать видео в файл, продемонстрировать видео."""
+
+
+def read_web_and_write():
+    video_capture = cv2.VideoCapture(0)
+    w = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+    h = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    video_writer = cv2.VideoWriter(f'output/task_7.mp4', fourcc, 25, (w, h))
+
+    while video_capture.isOpened():
+        is_successful, frame = video_capture.read()
+        if is_successful:
+            cv2.imshow('willem dafoe', frame)
+            video_writer.write(frame)
+            key = cv2.waitKey(20)
+            if cv2.waitKey(5) == ord('q') or key == 27:
+                break
+        else:
+            break
+
+    video_capture.release()
+    video_writer.release()
+    cv2.destroyAllWindows()
+
+
+#read_web_and_write()
 
 """
 Задание 8. Залить крест одним из 3 цветов – красный,
@@ -167,20 +213,30 @@ def fill_central_pixel():
             frame_width = video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)
             frame_height = video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
             central_pixel = frame[
-                int(frame_height // 2):int(frame_height // 2 + 1),
-                int(frame_width // 2):int(frame_width // 2 + 1)
-            ][0][0]
-            central_pixel = (255, 0, 0) if max(central_pixel) == central_pixel[0] else (
-                (0, 255, 0) if max(central_pixel) == central_pixel[1] else (
-                    (0, 0, 255) if max(central_pixel) == central_pixel[2] else None
-                )
-            )
+                            int(frame_height // 2):int(frame_height // 2 + 1),
+                            int(frame_width // 2):int(frame_width // 2 + 1)
+                            ][0][0]
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            central_pixel_hsv = hsv[int(frame_height // 2), int(frame_width // 2)]
+            central_pixel_hsv_hue_value = central_pixel_hsv[0]
+            if central_pixel_hsv_hue_value < 30 or central_pixel_hsv_hue_value > 150:
+                central_pixel_color = (0, 0, 255)
+            elif 30 <= central_pixel_hsv_hue_value <= 90:
+                central_pixel_color = (0, 255, 0)
+            else:
+                central_pixel_color = (255, 0, 0)
+            # central_pixel_color = (255, 0, 0) if max(central_pixel) == central_pixel[0] else (
+            #     (0, 255, 0) if max(central_pixel) == central_pixel[1] else (
+            #         (0, 0, 255) if max(central_pixel) == central_pixel[2] else None
+            #     )
+            # )
 
             frame[
                 int(frame_height // 2 - 3):int(frame_height // 2 + 2),
                 int(frame_width // 2 - 3):int(frame_width // 2 + 2)
-            ] = central_pixel
-            draw_cross(video_capture, frame, central_pixel, cv2.FILLED)
+            ] = central_pixel_color
+            #draw_cross(video_capture, frame, central_pixel_color, cv2.FILLED)
+            draw_pentagram(video_capture, frame, central_pixel_color)
             cv2.imshow('red_cross', frame)
             key = cv2.waitKey(10)
             if cv2.waitKey(5) == ord('q') or key == 27:
@@ -192,8 +248,3 @@ def fill_central_pixel():
 
 
 fill_central_pixel()
-"""
-Задание 9. Подключите телефон, подключитесь к его
-камере, выведете на экран видео с камеры. Продемонстрировать процесс на
-ноутбуке преподавателя и своем телефоне.
-"""

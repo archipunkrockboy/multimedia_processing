@@ -1,4 +1,3 @@
-import datetime
 from typing import Union
 
 import cv2
@@ -24,6 +23,7 @@ def get_normalized_matrix(matrix: list[list[Union[int, float]]]) -> list[list[Un
 
 
 def gauss_blur(img: cv2.mat_wrapper, kernel_size: int, standard_deviation: int) -> cv2.mat_wrapper:
+    """Функция для построение Гауссова размытия"""
     kernel = np.array(get_normalized_matrix(get_gauss_matrix(kernel_size, standard_deviation)))
     x_start = y_start = kernel_size // 2
     copy_image = img.copy()
@@ -47,10 +47,13 @@ def main():
     # norm_gauss_7_50 = get_normalized_matrix(gauss_matrix_7_50)
 
     img = cv2.imread('test.jpg', cv2.IMREAD_GRAYSCALE)
+    for i in img:
+        print(list(i))
     cv2.imshow(f'image', img)
     # Задание 3-4: реализовать фильтр гаусса средствами языка python
 
     img1 = gauss_blur(img, 5, 100)
+
     cv2.imshow(f'my gauss blur with kernel 5x5 and SD 100', img1)
 
     img2 = gauss_blur(img, 7, 50)
@@ -66,3 +69,7 @@ def main():
 
 
 main()
+
+a = get_gauss_matrix(5, 5)
+print(get_normalized_matrix(a))
+
