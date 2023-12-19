@@ -33,7 +33,6 @@ def gauss_blur(img: cv2.mat_wrapper, kernel_size: int, standard_deviation: int) 
             for k in range(-(kernel_size // 2), kernel_size // 2 + 1):
                 for l in range(-(kernel_size // 2), kernel_size // 2 + 1):
                     val += img[i + k, j + l] * kernel[k + (kernel_size // 2), l + (kernel_size // 2)]
-
             copy_image[i][j] = val
     return copy_image
 
@@ -47,24 +46,21 @@ def main():
     # norm_gauss_5_100 = get_normalized_matrix(gauss_matrix_5_100)
     # norm_gauss_7_50 = get_normalized_matrix(gauss_matrix_7_50)
 
-    img = cv2.imread('test2.jpg', cv2.IMREAD_GRAYSCALE)
-
+    img = cv2.imread('test.jpg', cv2.IMREAD_GRAYSCALE)
+    cv2.imshow(f'image', img)
     # Задание 3-4: реализовать фильтр гаусса средствами языка python
 
-    start = datetime.datetime.now()
     img1 = gauss_blur(img, 5, 100)
-    end = datetime.datetime.now()
-    print(end - start)
-    # img2 = gauss_blur(img, 7, 50)
-    #
+    cv2.imshow(f'my gauss blur with kernel 5x5 and SD 100', img1)
+
+    img2 = gauss_blur(img, 7, 50)
+    cv2.imshow(f'my gauss blur with kernel 7x7 and SD 50', img2)
+
     # # Задание 5: реализовать фильтр гаусса методами cv2
-    #
-    # img3 = cv2.GaussianBlur(img, (5, 5), 5)
-    #
-    # cv2.imshow(f'5 100', img)
-    # cv2.imshow(f'5 100', img1)
-    # cv2.imshow(f'7 50', img2)
-    # cv2.imshow('gavno', img3)
+
+    img3 = cv2.GaussianBlur(img, (5, 5), 5)
+    cv2.imshow(f'cv2 gauss blur with kernel 5x5 and SD 5', img3)
+
     # # Задание 6: сравнить
     cv2.waitKey(0)
 
